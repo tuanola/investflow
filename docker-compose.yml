@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: investflow-postgres
+    environment:
+      POSTGRES_DB: investflow
+      POSTGRES_USER: investflow
+      POSTGRES_PASSWORD: investflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - investflow-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  investflow-postgres-data:
