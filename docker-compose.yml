@@ -11,5 +11,19 @@ services:
     volumes:
       - investflow-postgres-data:/var/lib/postgresql/data
 
+  backend:
+    build:
+      context: ./investflow-back
+    container_name: investflow-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/investflow
+      SPRING_DATASOURCE_USERNAME: investflow
+      SPRING_DATASOURCE_PASSWORD: investflow
+      SERVER_PORT: 8080
+    depends_on:
+      - postgres
+
 volumes:
   investflow-postgres-data:
