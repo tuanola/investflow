@@ -1,7 +1,8 @@
 # InvestFlow Backend
 
-InvestFlow backend is a Kotlin-based Spring Boot API scaffold for a simple portfolio project.  
-It provides the base structure for future backend features, starting with a clean, maintainable setup and a health-check endpoint.
+InvestFlow backend is the API and orchestration layer for the InvestFlow project. It is built with Kotlin and Spring Boot, and it coordinates the core backend flow for importing, processing, and validating investment data.
+
+The service is designed to provide a clean, maintainable foundation for the application, including request handling, business logic, persistence integration, and health checks. Data processing and validation are handled by a separate FastAPI service.
 
 ## Running with Docker
 

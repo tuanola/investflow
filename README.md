@@ -1,7 +1,8 @@
 # InvestFlow
 
-InvestFlow is a small full-stack project built with React, Kotlin,
-Spring Boot, and PostgreSQL.
+InvestFlow is a full-stack application for importing investment transaction data, validating and processing it, and turning it into clear portfolio insights. 
+
+It combines a React front end, a Kotlin/Spring Boot backend, and PostgreSQL storage, with FastAPI used for data processing and validation.
 
 ## Run with Docker Compose
 
