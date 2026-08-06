@@ -52,6 +52,16 @@ class ImportIntegrationTest(
             .andExpect(jsonPath("$[0].recordCount").value(42))
     }
 
+    @Test
+    fun openApiDocumentationDescribesImportsEndpoint() {
+        mockMvc.perform(get("/v3/api-docs"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.info.title").value("InvestFlow API"))
+            .andExpect(jsonPath("$.info.version").value("v1"))
+            .andExpect(jsonPath("$.paths['/imports'].get").exists())
+            .andExpect(jsonPath("$.components.schemas.ImportSummaryDto").exists())
+    }
+
     companion object {
         @Container
         @ServiceConnection
