@@ -58,3 +58,26 @@ cd investflow-back
 $env:SPRING_DATASOURCE_URL = "jdbc:postgresql://localhost:5432/investflow"
 ./mvnw.cmd test
 ```
+
+### Frontend
+
+Install the frontend dependencies and run the Vitest component tests:
+
+```bash
+cd investflow-front
+npm ci
+npm test
+```
+
+To rerun affected tests automatically while developing:
+
+```bash
+npm run test:watch
+```
+
+Run the production build and lint checks with:
+
+```bash
+npm run build
+npm run lint
+```

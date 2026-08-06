@@ -1,11 +1,9 @@
-export type ImportStatus = "uploaded" | "processing" | "completed" | "failed";
+export type ImportStatus = "UPLOADED" | "PROCESSING" | "COMPLETED" | "FAILED";
 
 export type PortfolioImport = {
-  id: string;
-  filename: string;
+  id: number;
+  fileName: string;
   status: ImportStatus;
-  createdAt: string;
-  completedAt?: string;
-  rowCount?: number;
-  transactionCount?: number;
+  uploadedAt: string;
+  recordCount: number;
 };
