@@ -1,143 +1,162 @@
-Recommended MVP
+# Recommended MVP
 
-InvestFlow MVP: Revolut CSV Portfolio Importer + Reporting Dashboard
+## InvestFlow MVP: Revolut CSV Portfolio Importer + Reporting Dashboard
 
-The app should let a user upload a synthetic Revolut stock export, process it through a backend pipeline, and view portfolio reports in React.
+InvestFlow should let a user upload a synthetic Revolut-style stock export, validate and process it through a FastAPI service, orchestrate the flow from a Kotlin/Spring Boot backend, and view portfolio reports in a React dashboard.
 
-What it must include
-1. React + TypeScript frontend
+## What the MVP must include
 
-Build only these pages:
+### 1. React + TypeScript frontend
 
-Page	What it shows
-Upload	CSV upload form
-Imports	List of previous imports
-Import detail	Pipeline stages and processing status
-Portfolio overview	Total invested, current value, P&L, fees
-Holdings	Current holdings table
-Reports	Allocation and P&L charts
+Build only the pages needed to show the end-to-end flow:
 
-That is enough UI for a credible fullstack project.
+| Page | What it shows |
+| --- | --- |
+| Upload | CSV upload form and import trigger |
+| Imports | List of previous imports |
+| Import detail | Pipeline stages, validation status, and processing outcome |
+| Portfolio overview | Total invested, current value, P&L, and fees |
+| Holdings | Current holdings table |
+| Reports | Allocation and P&L charts |
 
-2. FastAPI backend
+That is enough UI for a credible full-stack project.
 
-Build these endpoints:
+### 2. Kotlin + Spring Boot backend
 
-GET  /health
-POST /imports
-GET  /imports
-GET  /imports/{import_id}
-GET  /imports/{import_id}/stages
-GET  /imports/{import_id}/overview
-GET  /imports/{import_id}/holdings
-GET  /imports/{import_id}/transactions
-GET  /imports/{import_id}/reports/allocation
+Use Spring Boot as the main application layer and API surface for the frontend.
 
-This shows API design, file upload, typed responses, and frontend integration.
+It should:
+- accept the upload request from the frontend,
+- create and track import records,
+- coordinate validation and processing with FastAPI,
+- persist the final data in PostgreSQL,
+- expose read endpoints for the dashboard,
+- provide `/health` and Swagger/OpenAPI documentation.
 
-3. PostgreSQL schema
+Suggested endpoints:
 
-Use these tables:
+- `GET /health`
+- `POST /imports`
+- `GET /imports`
+- `GET /imports/{import_id}`
+- `GET /imports/{import_id}/stages`
+- `GET /imports/{import_id}/overview`
+- `GET /imports/{import_id}/holdings`
+- `GET /imports/{import_id}/transactions`
+- `GET /imports/{import_id}/reports/allocation`
+- `GET /imports/{import_id}/reports/pnl`
 
-imports
-pipeline_stages
-transactions
-holdings
-portfolio_summary
-reports
+### 3. FastAPI processing and validation service
 
-For MVP, skip separate market_prices, fx_rates, and pipeline_events tables at first. Add them later.
+Use FastAPI for the data processing and validation work.
 
-4. Simple pipeline
+It should:
+- validate the uploaded CSV structure,
+- check required columns and row-level data quality,
+- normalise transactions into a consistent model,
+- calculate holdings and portfolio summaries,
+- generate report-ready output for the dashboard,
+- return clear validation errors when the input is invalid.
+
+A simple first version can run synchronously. The main goal is to show a clean separation between orchestration in Kotlin and data processing in Python.
+
+### 4. PostgreSQL schema
+
+Use PostgreSQL to store the import lifecycle and the processed portfolio data.
+
+Suggested tables:
+- `imports`
+- `pipeline_stages`
+- `transactions`
+- `holdings`
+- `portfolio_summary`
+- `reports`
+- `processing_errors`
+
+For the MVP, skip separate `market_prices`, `fx_rates`, and event-queue tables. Add them later if the project grows.
+
+### 5. Simple pipeline
 
 When a file is uploaded:
 
-upload CSV
-  -> validate file
-  -> normalise transactions
-  -> calculate holdings
-  -> generate reports
+1. store the raw file metadata,
+2. send the file to FastAPI for validation,
+3. normalise the transactions,
+4. calculate holdings and summary metrics,
+5. generate report data,
+6. persist everything in PostgreSQL,
+7. show the result in the dashboard.
 
-For MVP, this can run synchronously first, then move to Redis/RQ later.
+Store stage states so the import lifecycle is visible in the UI:
 
-But still store stages:
+- uploaded
+- validated
+- normalised
+- calculated
+- reported
 
-uploaded
-validated
-normalised
-calculated
-reported
+That gives you the pipeline concept without overbuilding.
 
-That gives you the event/pipeline concept without overbuilding.
-
-5. Synthetic Revolut-style data
+### 6. Synthetic Revolut-style data
 
 Use fake data committed to the repo:
 
-data/sample/synthetic_revolut_export.csv
+- `data/sample/synthetic_revolut_export.csv`
 
 Avoid real data in GitHub.
 
 Example columns:
 
+```csv
 Date,Ticker,Type,Quantity,Price,Currency,Fee,Total
 2026-01-12,AAPL,BUY,2,180.00,USD,1.00,361.00
 2026-02-03,AAPL,SELL,1,195.00,USD,1.00,194.00
 2026-03-10,VUAA,BUY,3,85.00,GBP,0.00,255.00
-6. Mock price and FX enrichment
+```
 
-For MVP, do not call external APIs yet.
+### 7. Mock price and FX enrichment
 
-Use hardcoded/mock reference data:
+For the MVP, do not call external APIs yet.
 
-AAPL latest price: 210 USD
-MSFT latest price: 450 USD
-VUAA latest price: 92 GBP
-USD -> GBP: 0.79
-EUR -> GBP: 0.86
+Use hardcoded or mock reference data:
+- AAPL latest price: 210 USD
+- MSFT latest price: 450 USD
+- VUAA latest price: 92 GBP
+- USD -> GBP: 0.79
+- EUR -> GBP: 0.86
 
 This keeps the MVP stable and testable.
 
-Later you can replace this with yfinance + Frankfurter.
+Later this can be replaced with live price and FX lookups.
 
-What this MVP demonstrates
-Skill	How MVP shows it
-React + TypeScript	Dashboard, forms, tables, charts
-FastAPI	Upload and reporting APIs
-Python data processing	CSV parsing, validation, calculations
-PostgreSQL	Proper persistence and schema design
-Data pipeline thinking	Pipeline stages and import lifecycle
-Financial data modelling	Transactions, holdings, P&L
-Testing	Unit tests for calculations and API tests
-Product thinking	Useful dashboard and reports
-Platform thinking	Docker Compose, clear docs, future async pipeline
-What to avoid in MVP
+## What this MVP demonstrates
+
+| Skill | How the MVP shows it |
+| --- | --- |
+| React + TypeScript | Dashboard, forms, tables, charts |
+| Spring Boot | Main API layer and orchestration |
+| FastAPI | Validation and data processing service |
+| Python data processing | CSV parsing, validation, calculations |
+| PostgreSQL | Proper persistence and schema design |
+| Pipeline thinking | Import lifecycle and stage tracking |
+| Financial data modelling | Transactions, holdings, P&L |
+| Testing | Unit tests for calculations and API tests |
+| Product thinking | Useful dashboard and reports |
+| Platform thinking | Docker Compose, clear docs, future async pipeline |
+
+## What to avoid in the MVP
 
 Do not include these yet:
 
-real AWS
-Kubernetes
-Terraform
-live stock API calls
-authentication
-multi-user support
-tax calculations
-stock predictions
-complex event bus
-ML model training
+- real AWS infrastructure
+- Kubernetes
+- Terraform
+- live stock API calls
+- authentication
+- multi-user support
+- tax calculations
+- stock predictions
+- complex event bus
+- ML model training
 
 Those are good later, but they will slow you down now.
-
-Best build sequence
-Frontend layout and mock pages.
-FastAPI /health.
-PostgreSQL + SQLAlchemy + Alembic.
-POST /imports upload endpoint.
-CSV validation.
-Transaction normalisation.
-Holdings calculation.
-Portfolio overview endpoint.
-React integration with real API.
-Allocation chart.
-Docker Compose.
-Tests and README.
