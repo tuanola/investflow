@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { ImportsPage } from "./ImportsPage";
 import { server } from "@/test/server";
 
-const importsEndpoint = "http://localhost:5173/api/imports";
+const importsEndpoint = "http://localhost:5173/api/v1/imports";
 
 function renderPage() {
   return render(
@@ -56,7 +56,7 @@ describe("ImportsPage", () => {
       "href",
       "/imports/42",
     );
-    expect(requestedPath).toBe("/api/imports");
+    expect(requestedPath).toBe("/api/v1/imports");
   });
 
   it("showsEmptyStateWhenBackendReturnsNoImports", async () => {

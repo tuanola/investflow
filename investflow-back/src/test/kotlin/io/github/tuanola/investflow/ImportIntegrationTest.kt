@@ -44,7 +44,7 @@ class ImportIntegrationTest(
             )
         )
 
-        mockMvc.perform(get("/imports"))
+        mockMvc.perform(get("/api/v1/imports"))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$[0].fileName").value("portfolio.csv"))
             .andExpect(jsonPath("$[0].status").value("COMPLETED"))
@@ -58,8 +58,20 @@ class ImportIntegrationTest(
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.info.title").value("InvestFlow API"))
             .andExpect(jsonPath("$.info.version").value("v1"))
-            .andExpect(jsonPath("$.paths['/imports'].get").exists())
+            .andExpect(jsonPath("$.paths['/api/v1/imports'].get").exists())
+            .andExpect(jsonPath("$.paths['/api/v1/imports'].get.tags[0]").value("Imports"))
+            .andExpect(jsonPath("$.paths['/api/v1/imports'].get.responses['200']").exists())
+            .andExpect(jsonPath("$.paths['/api/v1/imports'].post").exists())
+            .andExpect(
+                jsonPath(
+                    "$.paths['/api/v1/imports'].post.requestBody.content['multipart/form-data']" +
+                        ".schema.properties.file.format"
+                ).value("binary")
+            )
+            .andExpect(jsonPath("$.paths['/api/v1/imports'].post.responses['201']").exists())
+            .andExpect(jsonPath("$.paths['/api/v1/imports'].post.responses['400']").exists())
             .andExpect(jsonPath("$.components.schemas.ImportSummaryDto").exists())
+            .andExpect(jsonPath("$.components.schemas.ImportCreatedResponse").exists())
     }
 
     companion object {

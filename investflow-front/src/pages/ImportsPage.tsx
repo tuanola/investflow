@@ -12,7 +12,7 @@ export function ImportsPage() {
 
     async function loadImports() {
       try {
-        const response = await fetch("/api/imports", {
+        const response = await fetch("/api/v1/imports", {
           signal: controller.signal,
         });
 
