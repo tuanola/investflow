@@ -7,6 +7,9 @@ package io.github.tuanola.investflow.service
  * details to the import orchestration service.
  */
 interface CsvParser {
+    val isAvailableForProcessing: Boolean
+        get() = true
+
     fun parse(csv: UploadedCsv): ParsedCsv
 }
 

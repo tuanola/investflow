@@ -27,6 +27,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/investflow
       SPRING_DATASOURCE_USERNAME: investflow
       SPRING_DATASOURCE_PASSWORD: investflow
+      INVESTFLOW_PARSER_MODE: stub
       SERVER_PORT: 8080
     depends_on:
       postgres:

@@ -4,14 +4,13 @@ import io.github.tuanola.investflow.domain.ImportEntity
 import io.github.tuanola.investflow.dto.ImportSummaryDto
 import io.github.tuanola.investflow.repository.ImportRepository
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.ObjectProvider
 import org.springframework.stereotype.Service
 
 @Service
 class ImportServiceImpl(
     private val importRepository: ImportRepository,
     private val importLifecycle: ImportLifecycle,
-    private val csvParserProvider: ObjectProvider<CsvParser>
+    private val csvParser: CsvParser
 ) : ImportService {
 
     override fun listImports(): List<ImportSummaryDto> =
@@ -20,7 +19,10 @@ class ImportServiceImpl(
 
     override fun createImport(csv: UploadedCsv): Long {
         val importId = importLifecycle.createUploaded(csv.fileName)
-        val csvParser = csvParserProvider.ifAvailable ?: return importId
+
+        if (!csvParser.isAvailableForProcessing) {
+            return importId
+        }
 
         importLifecycle.markProcessing(importId)
 
