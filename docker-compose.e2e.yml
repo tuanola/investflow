@@ -1,28 +1,25 @@
+name: investflow-e2e
+
 services:
   postgres:
     image: postgres:16
-    container_name: investflow-postgres
     environment:
       POSTGRES_DB: investflow
       POSTGRES_USER: investflow
       POSTGRES_PASSWORD: investflow
-    ports:
-      - "5432:5432"
-    volumes:
-      - investflow-postgres-data:/var/lib/postgresql/data
+    tmpfs:
+      - /var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U investflow -d investflow"]
-      interval: 5s
+      interval: 2s
       timeout: 5s
-      retries: 10
-      start_period: 5s
+      retries: 15
 
   backend:
     build:
       context: ./investflow-back
-    container_name: investflow-backend
     ports:
-      - "8080:8080"
+      - "18080:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/investflow
       SPRING_DATASOURCE_USERNAME: investflow
@@ -31,17 +28,3 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-
-  frontend:
-    build:
-      context: ./investflow-front
-    container_name: investflow-frontend
-    ports:
-      - "5173:5173"
-    environment:
-      API_PROXY_TARGET: http://backend:8080
-    depends_on:
-      - backend
-
-volumes:
-  investflow-postgres-data:

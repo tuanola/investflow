@@ -87,14 +87,11 @@ npm run lint
 
 ### End-to-end tests
 
-The Playwright end-to-end tests start the frontend development server
-automatically. Tests covering API functionality also require PostgreSQL and the
-backend:
+The Playwright end-to-end tests use a disposable PostgreSQL database, start the
+Spring Boot backend, and start the frontend development server automatically.
+Docker must be running before the tests are started.
 
 ```bash
-# From the repository root
-docker compose up --build --detach postgres backend
-
 cd investflow-front
 npm ci
 
@@ -104,8 +101,9 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Do not start the Compose `frontend` service at the same time, because
-Playwright's development server uses the same port.
+The E2E stack uses ports 18080 and 15173, so it can run alongside the development
+stack. Its temporary database and containers are removed after the suite,
+including when a test fails. The development PostgreSQL volume is not used.
 
 Run the tests interactively while developing with:
 

@@ -19,7 +19,7 @@ export default defineConfig({
     ],
   ],
   use: {
-    baseURL: 'http://127.0.0.1:5173',
+    baseURL: 'http://127.0.0.1:15173',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -31,8 +31,12 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run dev -- --host 127.0.0.1 --port 5173',
-    url: 'http://127.0.0.1:5173',
-    reuseExistingServer: !isCI,
+    command: 'npm run dev -- --host 127.0.0.1 --port 15173',
+    url: 'http://127.0.0.1:15173',
+    reuseExistingServer: false,
+    timeout: 120_000,
+    env: {
+      API_PROXY_TARGET: 'http://127.0.0.1:18080',
+    },
   },
 });
