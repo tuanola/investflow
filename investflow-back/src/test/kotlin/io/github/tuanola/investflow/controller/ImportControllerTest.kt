@@ -2,10 +2,12 @@ package io.github.tuanola.investflow.controller
 
 import io.github.tuanola.investflow.dto.ImportSummaryDto
 import io.github.tuanola.investflow.service.ImportService
+import io.github.tuanola.investflow.service.UploadedCsv
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.given
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoInteractions
+import org.mockito.ArgumentMatchers.argThat
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.http.MediaType
@@ -89,14 +91,24 @@ class ImportControllerTest(
     @Test
     fun uploadImport_returnsCreatedResponseForCsvFile() {
         val file = csvFile(fileName = "portfolio.csv")
-        given(importService.createUploadedImport("portfolio.csv")).willReturn(42L)
+        given(
+            importService.createImport(
+                uploadedCsvMatching { csv -> csv.fileName == "portfolio.csv" }
+            )
+        )
+            .willReturn(42L)
 
         mockMvc.perform(multipart("/api/v1/imports").file(file))
             .andExpect(status().isCreated)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.importId").value(42))
 
-        verify(importService).createUploadedImport("portfolio.csv")
+        verify(importService).createImport(
+            uploadedCsvMatching { csv ->
+                csv.fileName == "portfolio.csv" &&
+                    csv.content.contentEquals("Date,Ticker\n".toByteArray())
+            }
+        )
     }
 
     @Test
@@ -142,4 +154,7 @@ class ImportControllerTest(
 
     private fun csvFile(fileName: String): MockMultipartFile =
         MockMultipartFile("file", fileName, "text/csv", "Date,Ticker\n".toByteArray())
+
+    private fun uploadedCsvMatching(predicate: (UploadedCsv) -> Boolean): UploadedCsv =
+        argThat<UploadedCsv>(predicate) ?: UploadedCsv("", byteArrayOf())
 }

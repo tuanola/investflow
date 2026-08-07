@@ -3,6 +3,7 @@ package io.github.tuanola.investflow.controller
 import io.github.tuanola.investflow.dto.ImportCreatedResponse
 import io.github.tuanola.investflow.dto.ImportSummaryDto
 import io.github.tuanola.investflow.service.ImportService
+import io.github.tuanola.investflow.service.UploadedCsv
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -41,13 +42,13 @@ class ImportController(
 
     @Operation(
         summary = "Upload an import",
-        description = "Accepts a CSV file and creates an import in the uploaded state"
+        description = "Accepts a CSV file and runs configured synchronous import processing"
     )
     @ApiResponses(
         value = [
             ApiResponse(
                 responseCode = "201",
-                description = "Import created successfully",
+                description = "Import created; inspect its status for the processing result",
                 content = [
                     Content(
                         mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -89,7 +90,12 @@ class ImportController(
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Only CSV files are allowed")
         }
 
-        val importId = importService.createUploadedImport(fileName)
+        val importId = importService.createImport(
+            UploadedCsv(
+                fileName = fileName,
+                content = file.bytes
+            )
+        )
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
