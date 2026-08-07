@@ -84,3 +84,37 @@ Run the production build and lint checks with:
 npm run build
 npm run lint
 ```
+
+### End-to-end tests
+
+The Playwright end-to-end tests start the frontend development server
+automatically. Tests covering API functionality also require PostgreSQL and the
+backend:
+
+```bash
+# From the repository root
+docker compose up --build --detach postgres backend
+
+cd investflow-front
+npm ci
+
+# Required once for each Playwright version
+npx playwright install chromium
+
+npm run test:e2e
+```
+
+Do not start the Compose `frontend` service at the same time, because
+Playwright's development server uses the same port.
+
+Run the tests interactively while developing with:
+
+```bash
+npm run test:e2e:ui
+```
+
+Open the most recent HTML report with:
+
+```bash
+npx playwright show-report .playwright/report
+```
