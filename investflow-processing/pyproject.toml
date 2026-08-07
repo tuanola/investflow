@@ -1,0 +1,15 @@
+[project]
+name = "investflow-processing"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Anna Shtanova", email = "tuanola@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi[standard]>=0.141.1",
+]
+
+[tool.uv]
+package = false
