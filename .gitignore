@@ -1,2 +1,6 @@
 .DS_Store
 docs/temp/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
