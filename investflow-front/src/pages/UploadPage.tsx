@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { ImportPipeline } from "@/components/ImportPipeline";
 import { UploadFile } from "@/components/UploadFile";
@@ -19,7 +20,9 @@ const uploadSchema = z.object({
 type UploadFormValues = z.infer<typeof uploadSchema>;
 
 export function UploadPage() {
+  const navigate = useNavigate();
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const {
     register,
@@ -33,19 +36,29 @@ export function UploadPage() {
     },
   });
 
-  function onSubmit(data: UploadFormValues) {
+  async function onSubmit(data: UploadFormValues) {
     const file = data.file[0];
+    const formData = new FormData();
+    formData.append("file", file);
 
-    console.log("Mock upload:", {
-      filename: file.name,
-      size: file.size,
-      baseCurrency: data.baseCurrency,
-    });
+    setUploadError(null);
 
-    alert(`Mock upload started for ${file.name}`);
+    try {
+      const response = await fetch("/api/v1/imports", {
+        method: "POST",
+        body: formData,
+      });
 
-    reset();
-    setSelectedFileName(null);
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      reset();
+      setSelectedFileName(null);
+      navigate("/imports");
+    } catch {
+      setUploadError("Could not upload the file. Please try again.");
+    }
   }
 
   return (
@@ -109,7 +122,7 @@ export function UploadPage() {
                 disabled={isSubmitting}
                 className="inline-flex items-center justify-center rounded-lg bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Start import
+                {isSubmitting ? "Uploading…" : "Start import"}
               </button>
 
               <button
@@ -117,12 +130,22 @@ export function UploadPage() {
                 onClick={() => {
                   reset();
                   setSelectedFileName(null);
+                  setUploadError(null);
                 }}
                 className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
               >
                 Clear
               </button>
             </div>
+
+            {uploadError && (
+              <div
+                className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+                role="alert"
+              >
+                {uploadError}
+              </div>
+            )}
           </div>
         </form>
 
